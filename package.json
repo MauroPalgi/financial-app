@@ -1,0 +1,20 @@
+{
+  "name": "financial-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd frontend && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MauroPalgi/financial-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MauroPalgi/financial-app/issues"
+  },
+  "homepage": "https://github.com/MauroPalgi/financial-app#readme"
+}
