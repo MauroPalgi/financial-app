@@ -3,10 +3,11 @@ const multer = require("multer");
 const xlsx = require("xlsx");
 const fs = require("fs");
 const os = require("os");
-
+const cors = require("cors");
 const app = express();
-const port = 3000;
+const port = 3001;
 
+app.use(cors());
 // Configuración de multer para manejar la carga de archivos
 const upload = multer({ dest: os.tmpdir() });
 
