@@ -1,51 +1,33 @@
 const express = require("express");
 const multer = require("multer");
-const xlsx = require("xlsx");
-const fs = require("fs");
-const os = require("os");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const cors = require("cors");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const app = express();
-const port = 3001;
 
+// ROUTES
+const routePagos = require("./routes/pagos");
+
+const { SERVER_PORT, MONGO_DB_URL } = process.env;
 app.use(cors());
-// Configuración de multer para manejar la carga de archivos
-const upload = multer({ dest: os.tmpdir() });
 
-app.post("/process-excel", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-  const workbook = xlsx.readFile(req.file.path);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  const jsonData = xlsx.utils.sheet_to_json(worksheet);
+app.use("/pagos", routePagos);
 
-  // Procesar los datos del archivo Excel aquí
+mongoose
+  .connect(MONGO_DB_URL)
+  .then(() => {
+    console.log("Conexión establecida mongoose");
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 
-  fs.unlinkSync(req.file.path); // Eliminar el archivo temporal
-  console.log({ jsonData });
-  res.send(jsonData); // Enviar datos procesados de vuelta al cliente
-});
-
-app.post("/process-pdf", upload.single("file"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  const filePath = req.file.path;
-  const dataBuffer = fs.readFileSync(filePath);
-
-  try {
-    const data = await pdfParse(dataBuffer);
-    fs.unlinkSync(filePath); // Eliminar el archivo temporal
-    res.send(data.text); // Enviar texto extraído de vuelta al cliente
-  } catch (error) {
-    fs.unlinkSync(filePath); // Eliminar el archivo temporal
-    res.status(500).send("Failed to process the PDF file.");
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+app.listen(SERVER_PORT, () => {
+  console.log(`Server running at http://127.0.0.1:${SERVER_PORT}/`);
 });
